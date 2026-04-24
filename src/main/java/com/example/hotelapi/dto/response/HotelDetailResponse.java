@@ -1,12 +1,13 @@
 package com.example.hotelapi.dto.response;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class HotelDetailResponse {
+public class HotelDetailResponse implements Serializable {
 
     private final Long id;
     private final String name;

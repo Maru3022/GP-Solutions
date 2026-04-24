@@ -1,12 +1,13 @@
 package com.example.hotelapi.dto.response;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class ApiErrorResponse {
+public class ApiErrorResponse implements Serializable {
 
     private final LocalDateTime timestamp;
     private final int status;

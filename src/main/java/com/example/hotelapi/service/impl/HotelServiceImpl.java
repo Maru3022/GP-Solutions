@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Comparator;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "hotels")
     public List<HotelShortResponse> getAll() {
         return hotelRepository.findAll().stream()
                 .sorted(Comparator.comparing(Hotel::getId))
@@ -47,11 +51,13 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "hotelDetails", key = "#id")
     public HotelDetailResponse getById(Long id) {
         return hotelMapper.toDetailResponse(getHotelOrThrow(id));
     }
 
     @Override
+    @Cacheable(cacheNames = "hotelSearch")
     public List<HotelShortResponse> search(String name, String brand, String city, String country, List<String> amenities) {
         Specification<Hotel> specification = Specification.allOf(
                 HotelSpecifications.nameContains(name),
@@ -69,6 +75,12 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "hotels", allEntries = true),
+            @CacheEvict(cacheNames = "hotelDetails", allEntries = true),
+            @CacheEvict(cacheNames = "hotelSearch", allEntries = true),
+            @CacheEvict(cacheNames = "hotelHistogram", allEntries = true)
+    })
     public HotelShortResponse create(HotelCreateRequest request) {
         Hotel savedHotel = hotelRepository.save(hotelMapper.toEntity(request));
         return hotelMapper.toShortResponse(savedHotel);
@@ -76,6 +88,12 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "hotels", allEntries = true),
+            @CacheEvict(cacheNames = "hotelDetails", key = "#hotelId"),
+            @CacheEvict(cacheNames = "hotelSearch", allEntries = true),
+            @CacheEvict(cacheNames = "hotelHistogram", allEntries = true)
+    })
     public HotelDetailResponse addAmenities(Long hotelId, List<String> amenities) {
         Hotel hotel = getHotelOrThrow(hotelId);
         if (amenities != null) {
@@ -91,6 +109,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "hotelHistogram", key = "#param")
     public Map<String, Long> getHistogram(String param) {
         String normalizedParam = normalize(param);
         return switch (normalizedParam) {

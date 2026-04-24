@@ -8,9 +8,14 @@ REST API for hotel management built with Spring Boot, Spring Data JPA, H2, Liqui
 - Spring Boot
 - Spring Web
 - Spring Data JPA
+- Spring Cache
+- Redis
 - H2
+- PostgreSQL
 - Liquibase
 - Swagger / OpenAPI
+- Docker / Docker Compose
+- GitHub Actions CI/CD
 - JUnit 5 / MockMvc
 
 ## Run
@@ -33,6 +38,12 @@ Swagger UI:
 
 ```text
 http://localhost:8092/swagger-ui.html
+```
+
+OpenAPI docs:
+
+```text
+http://localhost:8092/v3/api-docs
 ```
 
 H2 console:
@@ -72,5 +83,47 @@ GET /property-view/histogram/amenities
 - `h2` default
 - `postgres`
 - `mysql`
+- `redis`
+- `prod`
 
 Switch database profile in [application.properties](/D:/GP-Solutions/src/main/resources/application.properties) by changing `spring.profiles.active`.
+
+`prod` profile includes PostgreSQL and Redis.
+
+## Production-like local run
+
+Build jar:
+
+```bash
+./mvnw clean package
+```
+
+Start full stack:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+
+- PostgreSQL on `localhost:5432`
+- Redis on `localhost:6379`
+- API on `localhost:8092`
+
+## Redis caching
+
+Redis cache is configured for:
+
+- hotel list
+- hotel details
+- search results
+- histogram results
+
+Write operations clear related caches automatically.
+
+## CI/CD
+
+GitHub Actions pipeline is configured in [.github/workflows/ci-cd.yml](/D:/GP-Solutions/.github/workflows/ci-cd.yml):
+
+- CI: clean build + tests + jar artifact
+- CD: Docker image build and publish to `ghcr.io`

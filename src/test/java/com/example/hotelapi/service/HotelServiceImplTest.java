@@ -3,6 +3,7 @@ package com.example.hotelapi.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,11 +13,13 @@ import com.example.hotelapi.dto.request.HotelCreateRequest;
 import com.example.hotelapi.entity.Amenity;
 import com.example.hotelapi.entity.Hotel;
 import com.example.hotelapi.exception.HotelNotFoundException;
+import com.example.hotelapi.exception.InvalidHistogramParameterException;
 import com.example.hotelapi.mapper.HotelMapper;
 import com.example.hotelapi.repository.AmenityRepository;
 import com.example.hotelapi.repository.HotelRepository;
 import com.example.hotelapi.service.impl.HotelServiceImpl;
 import java.time.LocalTime;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -97,6 +100,44 @@ class HotelServiceImplTest {
         verify(hotelRepository).save(any(Hotel.class));
     }
 
+    @Test
+    void shouldAddAmenitiesToHotel() {
+        Hotel hotel = createHotel();
+
+        when(hotelRepository.findWithAmenitiesById(1L)).thenReturn(Optional.of(hotel));
+        when(amenityRepository.findByNameIgnoreCase("Spa")).thenReturn(Optional.empty());
+        when(hotelRepository.save(any(Hotel.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(amenityRepository.save(any(Amenity.class))).thenAnswer(invocation -> {
+            Amenity amenity = invocation.getArgument(0);
+            amenity.setId(2L);
+            return amenity;
+        });
+
+        var response = hotelService.addAmenities(1L, List.of("Spa"));
+
+        assertThat(response.getAmenities()).contains("Spa", "Free WiFi");
+        verify(amenityRepository).save(any(Amenity.class));
+    }
+
+    @Test
+    void shouldReturnHistogramByCity() {
+        when(hotelRepository.countByCity()).thenReturn(List.of(
+                new Object[]{"Minsk", 2L},
+                new Object[]{"Brest", 1L}
+        ));
+
+        var histogram = hotelService.getHistogram("city");
+
+        assertThat(histogram).containsEntry("Brest", 1L);
+        assertThat(histogram).containsEntry("Minsk", 2L);
+    }
+
+    @Test
+    void shouldThrowForUnsupportedHistogram() {
+        assertThatThrownBy(() -> hotelService.getHistogram("invalid"))
+                .isInstanceOf(InvalidHistogramParameterException.class);
+    }
+
     private Hotel createHotel() {
         Amenity amenity = new Amenity();
         amenity.setId(1L);
@@ -116,7 +157,7 @@ class HotelServiceImplTest {
         hotel.setEmail("doubletreeminsk.info@hilton.com");
         hotel.setCheckIn(LocalTime.of(14, 0));
         hotel.setCheckOut(LocalTime.of(12, 0));
-        hotel.setAmenities(Set.of(amenity));
+        hotel.setAmenities(new LinkedHashSet<>(Set.of(amenity)));
         return hotel;
     }
 }

@@ -76,6 +76,13 @@ class HotelControllerIntegrationTest {
     }
 
     @Test
+    void shouldExposeSwaggerApiDocs() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info.title").value("Hotel API"));
+    }
+
+    @Test
     void shouldReturnHotelDetails() throws Exception {
         mockMvc.perform(get("/property-view/hotels/1"))
                 .andExpect(status().isOk())
