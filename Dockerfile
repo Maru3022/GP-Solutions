@@ -15,14 +15,11 @@ WORKDIR /app
 # Copy JAR from builder
 COPY --from=builder /build/target/*.jar app.jar
 
-# Health check
+# Health check using busybox wget (already present in Alpine)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:8092/actuator/health || exit 1
+    CMD wget -q -O /dev/null http://localhost:8092/actuator/health || exit 1
 
 EXPOSE 8092
-
-# Install wget for healthcheck
-RUN apk add --no-cache wget
 
 # Run as non-root user
 RUN addgroup -g 1000 appuser && \

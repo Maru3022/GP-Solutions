@@ -191,7 +191,10 @@
                 <configuration>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <skipSystemScope>true</skipSystemScope>
-                    <nvdApiDelay>6000</nvdApiDelay>
+                    <nvdApiKey>${nvdApiKey}</nvdApiKey>
+                    <nvdApiDelay>10000</nvdApiDelay>
+                    <connectionTimeout>60000</connectionTimeout>
+                    <readTimeout>60000</readTimeout>
                 </configuration>
                 <executions>
                     <execution>
