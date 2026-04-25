@@ -85,7 +85,7 @@ class HotelMapperTest {
 
         assertThat(response.getId()).isEqualTo(2L);
         assertThat(response.getName()).isEqualTo("Marriott");
-        assertThat(response.getAmenities()).containsExactly("WiFi");
+        assertThat(response.getAmenities()).containsExactlyInAnyOrder("WiFi");
         assertThat(response.getAddress().getCity()).isEqualTo("City");
         assertThat(response.getContacts().getPhone()).isEqualTo("+1");
         assertThat(response.getArrivalTime().getCheckIn()).isEqualTo("14:00");
@@ -94,6 +94,21 @@ class HotelMapperTest {
     @Test
     void toFullResponse_shouldReturnNull_whenInputNull() {
         assertThat(mapper.toFullResponse(null)).isNull();
+    }
+
+    @Test
+    void toFullResponse_shouldHandleNullAmenities() {
+        Hotel hotel = Hotel.builder()
+                .id(3L)
+                .name("Test Hotel")
+                .brand("Test Brand")
+                .build();
+
+        HotelFullResponse response = mapper.toFullResponse(hotel);
+
+        assertThat(response.getId()).isEqualTo(3L);
+        assertThat(response.getName()).isEqualTo("Test Hotel");
+        assertThat(response.getAmenities()).isEmpty();
     }
 
     @Test
