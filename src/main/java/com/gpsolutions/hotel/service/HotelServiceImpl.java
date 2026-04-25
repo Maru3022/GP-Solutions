@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -118,7 +119,7 @@ public class HotelServiceImpl implements HotelService {
 
         // Find or create amenities
         Set<Amenity> amenities = new HashSet<>();
-        int newAmenitiesCount = 0;
+        List<String> newlyCreatedAmenities = new ArrayList<>();
         for (String amenityName : amenityNames) {
             Amenity amenity = amenityRepository.findByName(amenityName)
                     .orElseGet(() -> {
@@ -126,7 +127,7 @@ public class HotelServiceImpl implements HotelService {
                         Amenity newAmenity = Amenity.builder()
                                 .name(amenityName)
                                 .build();
-                        newAmenitiesCount++;
+                        newlyCreatedAmenities.add(amenityName);
                         return amenityRepository.save(newAmenity);
                     });
             amenities.add(amenity);
@@ -135,7 +136,8 @@ public class HotelServiceImpl implements HotelService {
         hotel.setAmenities(amenities);
         Hotel updatedHotel = hotelRepository.save(hotel);
 
-        log.info("Successfully added amenities to hotel ID: {} ({} new amenities created)", hotelId, newAmenitiesCount);
+        log.info("Successfully added amenities to hotel ID: {} ({} new amenities created: {})", 
+                hotelId, newlyCreatedAmenities.size(), newlyCreatedAmenities);
         return hotelMapper.toFullResponse(updatedHotel);
     }
 
