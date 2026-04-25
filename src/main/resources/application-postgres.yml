@@ -1,0 +1,20 @@
+# PostgreSQL Profile Configuration
+# Используйте эту конфигурацию с параметром: --spring.profiles.active=postgres
+
+spring:
+  datasource:
+    # url: jdbc:postgresql://localhost:5432/hoteldb
+    # driver-class-name: org.postgresql.Driver
+    # username: postgres
+    # password: your_password
+    url: jdbc:h2:mem:hoteldb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        # dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        dialect: org.hibernate.dialect.H2Dialect

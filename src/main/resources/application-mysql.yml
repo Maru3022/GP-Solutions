@@ -1,0 +1,20 @@
+# MySQL Profile Configuration
+# Используйте эту конфигурацию с параметром: --spring.profiles.active=mysql
+
+spring:
+  datasource:
+    # url: jdbc:mysql://localhost:3306/hoteldb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    # username: root
+    # password: your_password
+    url: jdbc:h2:mem:hoteldb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        # dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.H2Dialect

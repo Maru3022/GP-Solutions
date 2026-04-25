@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Insert initial AMENITIES -->
+    <changeSet id="100-insert-amenities" author="admin">
+        <insert tableName="amenity">
+            <column name="id" value="1"/>
+            <column name="name" value="Free Wi-Fi"/>
+        </insert>
+        <insert tableName="amenity">
+            <column name="id" value="2"/>
+            <column name="name" value="Swimming Pool"/>
+        </insert>
+        <insert tableName="amenity">
+            <column name="id" value="3"/>
+            <column name="name" value="Fitness Center"/>
+        </insert>
+        <insert tableName="amenity">
+            <column name="id" value="4"/>
+            <column name="name" value="Restaurant"/>
+        </insert>
+        <insert tableName="amenity">
+            <column name="id" value="5"/>
+            <column name="name" value="Parking"/>
+        </insert>
+        <insert tableName="amenity">
+            <column name="id" value="6"/>
+            <column name="name" value="Conference Room"/>
+        </insert>
+        <insert tableName="amenity">
+            <column name="id" value="7"/>
+            <column name="name" value="Spa"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert first HOTEL (Marriott, Minsk) -->
+    <changeSet id="101-insert-hotel-1" author="admin">
+        <!-- Insert Contacts -->
+        <insert tableName="contacts">
+            <column name="id" value="1"/>
+            <column name="phone" value="+375291234567"/>
+            <column name="email" value="marriott.minsk@example.com"/>
+        </insert>
+        <!-- Insert Address -->
+        <insert tableName="address">
+            <column name="id" value="1"/>
+            <column name="house_number" value="9"/>
+            <column name="street" value="Pobediteley Avenue"/>
+            <column name="city" value="Minsk"/>
+            <column name="country" value="Belarus"/>
+            <column name="post_code" value="220004"/>
+        </insert>
+        <!-- Insert Hotel -->
+        <insert tableName="hotel">
+            <column name="id" value="1"/>
+            <column name="name" value="Marriott Hotel Minsk"/>
+            <column name="description" value="Luxury 5-star hotel in the heart of Minsk with modern amenities and excellent service"/>
+            <column name="brand" value="Marriott"/>
+            <column name="address_id" value="1"/>
+            <column name="contacts_id" value="1"/>
+            <column name="check_in" value="15:00"/>
+            <column name="check_out" value="11:00"/>
+        </insert>
+    </changeSet>
+
+    <!-- Link first hotel with amenities -->
+    <changeSet id="102-link-hotel-1-amenities" author="admin">
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="1"/>
+            <column name="amenity_id" value="1"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="1"/>
+            <column name="amenity_id" value="2"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="1"/>
+            <column name="amenity_id" value="3"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="1"/>
+            <column name="amenity_id" value="4"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="1"/>
+            <column name="amenity_id" value="5"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert second HOTEL (Hilton, Moscow) -->
+    <changeSet id="103-insert-hotel-2" author="admin">
+        <!-- Insert Contacts -->
+        <insert tableName="contacts">
+            <column name="id" value="2"/>
+            <column name="phone" value="+79991234567"/>
+            <column name="email" value="hilton.moscow@example.com"/>
+        </insert>
+        <!-- Insert Address -->
+        <insert tableName="address">
+            <column name="id" value="2"/>
+            <column name="house_number" value="15"/>
+            <column name="street" value="Tverskaya Street"/>
+            <column name="city" value="Moscow"/>
+            <column name="country" value="Russia"/>
+            <column name="post_code" value="125009"/>
+        </insert>
+        <!-- Insert Hotel -->
+        <insert tableName="hotel">
+            <column name="id" value="2"/>
+            <column name="name" value="Hilton Moscow TVerskaya"/>
+            <column name="description" value="Premium 4-star hotel with contemporary design and convenient location"/>
+            <column name="brand" value="Hilton"/>
+            <column name="address_id" value="2"/>
+            <column name="contacts_id" value="2"/>
+            <column name="check_in" value="14:00"/>
+            <column name="check_out" value="12:00"/>
+        </insert>
+    </changeSet>
+
+    <!-- Link second hotel with amenities -->
+    <changeSet id="104-link-hotel-2-amenities" author="admin">
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="2"/>
+            <column name="amenity_id" value="1"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="2"/>
+            <column name="amenity_id" value="3"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="2"/>
+            <column name="amenity_id" value="4"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="2"/>
+            <column name="amenity_id" value="5"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="2"/>
+            <column name="amenity_id" value="6"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert third HOTEL (IHG, Saint Petersburg) -->
+    <changeSet id="105-insert-hotel-3" author="admin">
+        <!-- Insert Contacts -->
+        <insert tableName="contacts">
+            <column name="id" value="3"/>
+            <column name="phone" value="+78127654321"/>
+            <column name="email" value="ihg.spb@example.com"/>
+        </insert>
+        <!-- Insert Address -->
+        <insert tableName="address">
+            <column name="id" value="3"/>
+            <column name="house_number" value="2"/>
+            <column name="street" value="Nevsky Prospect"/>
+            <column name="city" value="Saint Petersburg"/>
+            <column name="country" value="Russia"/>
+            <column name="post_code" value="191186"/>
+        </insert>
+        <!-- Insert Hotel -->
+        <insert tableName="hotel">
+            <column name="id" value="3"/>
+            <column name="name" value="InterContinental Saint Petersburg"/>
+            <column name="description" value="Elegant 5-star hotel with historical charm and modern facilities"/>
+            <column name="brand" value="InterContinental"/>
+            <column name="address_id" value="3"/>
+            <column name="contacts_id" value="3"/>
+            <column name="check_in" value="15:00"/>
+            <column name="check_out" value="11:00"/>
+        </insert>
+    </changeSet>
+
+    <!-- Link third hotel with amenities -->
+    <changeSet id="106-link-hotel-3-amenities" author="admin">
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="3"/>
+            <column name="amenity_id" value="1"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="3"/>
+            <column name="amenity_id" value="2"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="3"/>
+            <column name="amenity_id" value="3"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="3"/>
+            <column name="amenity_id" value="4"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="3"/>
+            <column name="amenity_id" value="5"/>
+        </insert>
+        <insert tableName="hotel_amenities">
+            <column name="hotel_id" value="3"/>
+            <column name="amenity_id" value="7"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

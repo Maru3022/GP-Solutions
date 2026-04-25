@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Create CONTACTS table -->
+    <changeSet id="001-create-contacts-table" author="admin">
+        <createTable tableName="contacts">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="phone" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create ADDRESS table -->
+    <changeSet id="002-create-address-table" author="admin">
+        <createTable tableName="address">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="house_number" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="street" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_code" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create HOTEL table -->
+    <changeSet id="003-create-hotel-table" author="admin">
+        <createTable tableName="hotel">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="brand" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_hotel_address" references="address(id)"/>
+            </column>
+            <column name="contacts_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_hotel_contacts" references="contacts(id)"/>
+            </column>
+            <column name="check_in" type="VARCHAR(5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="check_out" type="VARCHAR(5)"/>
+        </createTable>
+        <addUniqueConstraint tableName="hotel" columnNames="address_id"/>
+        <addUniqueConstraint tableName="hotel" columnNames="contacts_id"/>
+    </changeSet>
+
+    <!-- Create AMENITY table -->
+    <changeSet id="004-create-amenity-table" author="admin">
+        <createTable tableName="amenity">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create HOTEL_AMENITIES join table (ManyToMany) -->
+    <changeSet id="005-create-hotel-amenities-table" author="admin">
+        <createTable tableName="hotel_amenities">
+            <column name="hotel_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_hotel_amenities_hotel" references="hotel(id)"/>
+            </column>
+            <column name="amenity_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_hotel_amenities_amenity" references="amenity(id)"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="hotel_amenities" columnNames="hotel_id,amenity_id"/>
+    </changeSet>
+
+    <!-- Create indices for better query performance -->
+    <changeSet id="006-create-indices" author="admin">
+        <createIndex tableName="hotel" indexName="idx_hotel_brand">
+            <column name="brand"/>
+        </createIndex>
+        <createIndex tableName="hotel" indexName="idx_hotel_name">
+            <column name="name"/>
+        </createIndex>
+        <createIndex tableName="address" indexName="idx_address_city">
+            <column name="city"/>
+        </createIndex>
+        <createIndex tableName="address" indexName="idx_address_country">
+            <column name="country"/>
+        </createIndex>
+        <createIndex tableName="amenity" indexName="idx_amenity_name">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
