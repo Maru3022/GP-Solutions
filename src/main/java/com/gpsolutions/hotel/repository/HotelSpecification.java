@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * JPA Specification for dynamic Hotel filtering.
@@ -20,6 +21,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HotelSpecification implements Specification<Hotel> {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private String brand;
@@ -35,7 +38,7 @@ public class HotelSpecification implements Specification<Hotel> {
         if (name != null && !name.isEmpty()) {
             predicates.add(cb.like(
                     cb.lower(root.get("name")),
-                    "%" + name.toLowerCase() + "%"
+                    "%" + name.toLowerCase(Locale.ROOT) + "%"
             ));
         }
 
@@ -43,7 +46,7 @@ public class HotelSpecification implements Specification<Hotel> {
         if (brand != null && !brand.isEmpty()) {
             predicates.add(cb.like(
                     cb.lower(root.get("brand")),
-                    "%" + brand.toLowerCase() + "%"
+                    "%" + brand.toLowerCase(Locale.ROOT) + "%"
             ));
         }
 
@@ -51,7 +54,7 @@ public class HotelSpecification implements Specification<Hotel> {
         if (city != null && !city.isEmpty()) {
             predicates.add(cb.like(
                     cb.lower(root.get("address").get("city")),
-                    "%" + city.toLowerCase() + "%"
+                    "%" + city.toLowerCase(Locale.ROOT) + "%"
             ));
         }
 
@@ -59,7 +62,7 @@ public class HotelSpecification implements Specification<Hotel> {
         if (country != null && !country.isEmpty()) {
             predicates.add(cb.like(
                     cb.lower(root.get("address").get("country")),
-                    "%" + country.toLowerCase() + "%"
+                    "%" + country.toLowerCase(Locale.ROOT) + "%"
             ));
         }
 

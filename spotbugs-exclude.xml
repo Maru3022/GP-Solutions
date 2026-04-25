@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude mutable object exposure in Lombok-generated DTO/Entity code -->
+    <Match>
+        <Or>
+            <Package name="com.gpsolutions.hotel.entity"/>
+            <Package name="com.gpsolutions.hotel.dto.request"/>
+            <Package name="com.gpsolutions.hotel.dto.response"/>
+        </Or>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
+    <!-- Exclude non-serialVersionUID warning for JPA Specifications -->
+    <Match>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+    <!-- Exclude locale-sensitive case conversion warnings (handled by business logic context) -->
+    <Match>
+        <Bug pattern="DM_CONVERT_CASE"/>
+    </Match>
+    <!-- Exclude mutable object exposure in Spring controllers and specifications -->
+    <Match>
+        <Or>
+            <Class name="com.gpsolutions.hotel.controller.HotelController"/>
+            <Class name="com.gpsolutions.hotel.repository.HotelSpecification"/>
+        </Or>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>

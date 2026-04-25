@@ -1,12 +1,6 @@
 package com.gpsolutions.hotel;
 
 import com.gpsolutions.hotel.controller.HotelController;
-import com.gpsolutions.hotel.dto.request.AddressRequest;
-import com.gpsolutions.hotel.dto.request.ArrivalTimeRequest;
-import com.gpsolutions.hotel.dto.request.ContactsRequest;
-import com.gpsolutions.hotel.dto.request.CreateHotelRequest;
-import com.gpsolutions.hotel.dto.response.HotelFullResponse;
-import com.gpsolutions.hotel.dto.response.HotelShortResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-class HotelPropertyViewApplicationTests {
+class HotelPropertyViewApplicationIT {
 
     @Autowired
     private MockMvc mockMvc;
