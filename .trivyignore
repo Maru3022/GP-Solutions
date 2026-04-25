@@ -1,0 +1,6 @@
+# Trivy ignore file for known vulnerabilities
+# This file allows the CI/CD pipeline to pass while documenting accepted risks
+
+# CVE-2024-XXXX: Example - Update when patch available
+# Reason: No fix available yet, low risk in containerized environment
+# Review date: 2026-05-01
