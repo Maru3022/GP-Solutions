@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of HotelService.
- * Contains business logic for hotel management.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,9 +33,6 @@ public class HotelServiceImpl implements HotelService {
     private final AmenityRepository amenityRepository;
     private final HotelMapper hotelMapper;
 
-    /**
-     * Get all hotels with short information.
-     */
     @Override
     @Transactional(readOnly = true)
     public List<HotelShortResponse> getAllHotels() {
@@ -51,9 +44,6 @@ public class HotelServiceImpl implements HotelService {
         return hotels;
     }
 
-    /**
-     * Get hotel by id with full information.
-     */
     @Override
     @Transactional(readOnly = true)
     public HotelFullResponse getHotelById(Long id) {
@@ -67,13 +57,10 @@ public class HotelServiceImpl implements HotelService {
         return hotelMapper.toFullResponse(hotel);
     }
 
-    /**
-     * Search hotels by various criteria using JPA Specification.
-     */
     @Override
     @Transactional(readOnly = true)
     public List<HotelShortResponse> searchHotels(String name, String brand, String city, String country, List<String> amenities) {
-        log.debug("Searching hotels with criteria - name: {}, brand: {}, city: {}, country: {}, amenities count: {}",
+        log.debug("Searching hotels - name: {}, brand: {}, city: {}, country: {}, amenities: {}",
                 name, brand, city, country, amenities != null ? amenities.size() : 0);
 
         HotelSpecification spec = new HotelSpecification(name, brand, city, country, amenities);
@@ -81,17 +68,14 @@ public class HotelServiceImpl implements HotelService {
                 .map(hotelMapper::toShortResponse)
                 .collect(Collectors.toList());
         
-        log.info("Search completed: found {} hotels matching criteria", results.size());
+        log.info("Search completed: found {} hotels", results.size());
         return results;
     }
 
-    /**
-     * Create a new hotel.
-     */
     @Override
     public HotelShortResponse createHotel(CreateHotelRequest request) {
         log.info("Creating new hotel: {}", request.getName());
-        log.debug("Hotel creation details - Brand: {}, City: {}, Country: {}", 
+        log.debug("Hotel details - Brand: {}, City: {}, Country: {}", 
                 request.getBrand(), 
                 request.getAddress() != null ? request.getAddress().getCity() : "N/A",
                 request.getAddress() != null ? request.getAddress().getCountry() : "N/A");
@@ -103,9 +87,6 @@ public class HotelServiceImpl implements HotelService {
         return hotelMapper.toShortResponse(savedHotel);
     }
 
-    /**
-     * Add amenities to a hotel.
-     */
     @Override
     public HotelFullResponse addAmenitiesToHotel(Long hotelId, List<String> amenityNames) {
         log.info("Adding {} amenities to hotel ID: {}", amenityNames.size(), hotelId);
@@ -117,7 +98,6 @@ public class HotelServiceImpl implements HotelService {
                     return new HotelNotFoundException(hotelId);
                 });
 
-        // Find or create amenities
         Set<Amenity> amenities = new HashSet<>();
         List<String> newlyCreatedAmenities = new ArrayList<>();
         for (String amenityName : amenityNames) {
@@ -136,14 +116,11 @@ public class HotelServiceImpl implements HotelService {
         hotel.setAmenities(amenities);
         Hotel updatedHotel = hotelRepository.save(hotel);
 
-        log.info("Successfully added amenities to hotel ID: {} ({} new amenities created: {})", 
+        log.info("Successfully added amenities to hotel ID: {} ({} new: {})", 
                 hotelId, newlyCreatedAmenities.size(), newlyCreatedAmenities);
         return hotelMapper.toFullResponse(updatedHotel);
     }
 
-    /**
-     * Get histogram data grouped by parameter.
-     */
     @Override
     @Transactional(readOnly = true)
     public Map<String, Long> getHistogram(String param) {

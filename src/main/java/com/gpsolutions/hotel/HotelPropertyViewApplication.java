@@ -8,10 +8,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-/**
- * Main Spring Boot application class for Hotel Property View API.
- * Runs on port 8092.
- */
 @SpringBootApplication
 public class HotelPropertyViewApplication {
 
@@ -19,9 +15,6 @@ public class HotelPropertyViewApplication {
         SpringApplication.run(HotelPropertyViewApplication.class, args);
     }
 
-    /**
-     * Configure OpenAPI documentation.
-     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()

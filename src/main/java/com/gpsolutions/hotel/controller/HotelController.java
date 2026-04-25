@@ -21,10 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * REST Controller for hotel management.
- * All endpoints are prefixed with /property-view
- */
 @Slf4j
 @RestController
 @RequestMapping("/property-view")
@@ -34,12 +30,6 @@ public class HotelController {
 
     private final HotelService hotelService;
 
-    /**
-     * GET /property-view/hotels
-     * Get all hotels with short information.
-     *
-     * @return List of HotelShortResponse
-     */
     @GetMapping("/hotels")
     @Operation(summary = "Get all hotels", description = "Returns a list of all hotels with short information")
     @ApiResponses(value = {
@@ -53,13 +43,6 @@ public class HotelController {
         return ResponseEntity.ok(hotels);
     }
 
-    /**
-     * GET /property-view/hotels/{id}
-     * Get hotel by id with full information.
-     *
-     * @param id Hotel id
-     * @return HotelFullResponse
-     */
     @GetMapping("/hotels/{id}")
     @Operation(summary = "Get hotel by id", description = "Returns full information about a specific hotel")
     @ApiResponses(value = {
@@ -78,18 +61,6 @@ public class HotelController {
         return ResponseEntity.ok(hotel);
     }
 
-    /**
-     * GET /property-view/search
-     * Search hotels by various criteria.
-     * Parameters are optional and can be combined.
-     *
-     * @param name Hotel name (contains search)
-     * @param brand Hotel brand
-     * @param city City
-     * @param country Country
-     * @param amenities Comma-separated list of amenities
-     * @return List of HotelShortResponse
-     */
     @GetMapping("/search")
     @Operation(summary = "Search hotels", description = "Search hotels by name, brand, city, country, and/or amenities")
     @ApiResponses(value = {
@@ -124,13 +95,6 @@ public class HotelController {
         return ResponseEntity.ok(results);
     }
 
-    /**
-     * POST /property-view/hotels
-     * Create a new hotel.
-     *
-     * @param request CreateHotelRequest with hotel data
-     * @return HotelShortResponse of created hotel
-     */
     @PostMapping("/hotels")
     @Operation(summary = "Create hotel", description = "Create a new hotel")
     @ApiResponses(value = {
@@ -150,14 +114,6 @@ public class HotelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHotel);
     }
 
-    /**
-     * POST /property-view/hotels/{id}/amenities
-     * Add amenities to a hotel.
-     *
-     * @param id Hotel id
-     * @param amenities JSON array of amenity names
-     * @return HotelFullResponse with updated amenities
-     */
     @PostMapping("/hotels/{id}/amenities")
     @Operation(summary = "Add amenities to hotel", description = "Add one or more amenities to a hotel")
     @ApiResponses(value = {
@@ -180,14 +136,6 @@ public class HotelController {
         return ResponseEntity.ok(updatedHotel);
     }
 
-    /**
-     * GET /property-view/histogram/{param}
-     * Get histogram data grouped by parameter.
-     * Parameters can be: brand, city, country, amenities
-     *
-     * @param param Grouping parameter
-     * @return Map with parameter values and counts
-     */
     @GetMapping("/histogram/{param}")
     @Operation(summary = "Get histogram", description = "Get count of hotels grouped by parameter (brand, city, country, amenities)")
     @ApiResponses(value = {
