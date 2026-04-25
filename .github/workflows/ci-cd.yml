@@ -210,30 +210,52 @@ jobs:
 
       - name: Start container for smoke test
         run: |
-          docker run -d --name hotel-api-smoke -p 8080:8080 \
+          echo "Starting Docker container for smoke test..."
+          docker run -d --name hotel-api-smoke -p 8092:8092 \
             -e SPRING_PROFILES_ACTIVE=h2 \
+            -e SERVER_PORT=8092 \
             hotel-api:test
+          echo "Container started, waiting for application..."
+          sleep 5
+          echo "Container status:"
+          docker ps -a | grep hotel-api-smoke
 
       - name: Wait for application health
         run: |
-          for i in {1..30}; do
-            echo "Attempt $i..."
-            if curl -sf http://localhost:8080/actuator/health; then
-              echo "Application is healthy"
+          echo "Waiting for application to become healthy..."
+          MAX_ATTEMPTS=30
+          ATTEMPT=1
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
+            if curl -sf http://localhost:8092/actuator/health > /dev/null 2>&1; then
+              echo "✅ Application is healthy!"
+              echo "Health response:"
+              curl -s http://localhost:8092/actuator/health | head -20
               exit 0
             fi
+            ATTEMPT=$((ATTEMPT + 1))
             sleep 2
           done
-          echo "Application failed to become healthy"
+          echo "❌ Application failed to become healthy after $MAX_ATTEMPTS attempts"
+          echo "Container logs:"
+          docker logs hotel-api-smoke 2>&1 | tail -50
           exit 1
 
       - name: Print container logs on failure
         if: failure()
-        run: docker logs hotel-api-smoke
+        run: |
+          echo "=== CONTAINER LOGS ==="
+          docker logs hotel-api-smoke 2>&1 || echo "Container not found"
+          echo "=== CONTAINER STATUS ==="
+          docker ps -a | grep hotel-api-smoke || echo "No container found"
 
       - name: Cleanup container
         if: always()
-        run: docker stop hotel-api-smoke && docker rm hotel-api-smoke
+        run: |
+          echo "Cleaning up container..."
+          docker stop hotel-api-smoke 2>/dev/null || echo "Container already stopped"
+          docker rm hotel-api-smoke 2>/dev/null || echo "Container already removed"
+          echo "Cleanup complete"
 
   docker-push:
     name: Push Docker Image
