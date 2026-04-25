@@ -21,6 +21,9 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 EXPOSE 8092
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 # Run as non-root user
 RUN addgroup -g 1000 appuser && \
     adduser -D -u 1000 -G appuser appuser

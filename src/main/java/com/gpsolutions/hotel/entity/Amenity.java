@@ -1,10 +1,7 @@
 package com.gpsolutions.hotel.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,10 +12,13 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "amenity")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+@ToString(of = {"id", "name"})
 public class Amenity {
 
     @Id

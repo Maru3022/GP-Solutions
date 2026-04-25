@@ -202,4 +202,12 @@
         </insert>
     </changeSet>
 
+    <!-- Reset H2 auto-increment sequences to avoid primary key conflicts during tests -->
+    <changeSet id="107-reset-h2-sequences" author="admin" dbms="h2">
+        <sql>ALTER TABLE contacts ALTER COLUMN id RESTART WITH 100</sql>
+        <sql>ALTER TABLE address ALTER COLUMN id RESTART WITH 100</sql>
+        <sql>ALTER TABLE hotel ALTER COLUMN id RESTART WITH 100</sql>
+        <sql>ALTER TABLE amenity ALTER COLUMN id RESTART WITH 100</sql>
+    </changeSet>
+
 </databaseChangeLog>

@@ -1,10 +1,7 @@
 package com.gpsolutions.hotel.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Entity representing hotel address information.
@@ -12,10 +9,13 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "address")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+@ToString(of = {"id", "city", "country"})
 public class Address {
 
     @Id
