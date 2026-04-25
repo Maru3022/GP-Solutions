@@ -275,6 +275,6 @@ class HotelPropertyViewApplicationIT {
     @Test
     void testHistogramWithInvalidParameter() throws Exception {
         mockMvc.perform(get("/property-view/histogram/invalid"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 }

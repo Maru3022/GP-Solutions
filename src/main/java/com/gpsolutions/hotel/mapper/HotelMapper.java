@@ -15,6 +15,7 @@ import com.gpsolutions.hotel.entity.Contacts;
 import com.gpsolutions.hotel.entity.Hotel;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -59,9 +60,9 @@ public class HotelMapper {
                 .address(toAddressResponse(hotel.getAddress()))
                 .contacts(toContactsResponse(hotel.getContacts()))
                 .arrivalTime(toArrivalTimeResponse(hotel.getArrivalTime()))
-                .amenities(hotel.getAmenities().stream()
+                .amenities(hotel.getAmenities() != null ? hotel.getAmenities().stream()
                         .map(amenity -> amenity.getName())
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.toList()) : List.of())
                 .build();
     }
 

@@ -42,10 +42,12 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @Transactional(readOnly = true)
     public List<HotelShortResponse> getAllHotels() {
-        log.debug("Fetching all hotels");
-        return hotelRepository.findAll().stream()
+        log.debug("Fetching all hotels from database");
+        List<HotelShortResponse> hotels = hotelRepository.findAll().stream()
                 .map(hotelMapper::toShortResponse)
                 .collect(Collectors.toList());
+        log.info("Successfully fetched {} hotels", hotels.size());
+        return hotels;
     }
 
     /**
@@ -54,9 +56,13 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @Transactional(readOnly = true)
     public HotelFullResponse getHotelById(Long id) {
-        log.debug("Fetching hotel by id: {}", id);
+        log.debug("Fetching hotel by ID: {}", id);
         Hotel hotel = hotelRepository.findById(id)
-                .orElseThrow(() -> new HotelNotFoundException(id));
+                .orElseThrow(() -> {
+                    log.error("Hotel not found with ID: {}", id);
+                    return new HotelNotFoundException(id);
+                });
+        log.info("Successfully fetched hotel: {} (ID: {})", hotel.getName(), id);
         return hotelMapper.toFullResponse(hotel);
     }
 
@@ -66,13 +72,16 @@ public class HotelServiceImpl implements HotelService {
     @Override
     @Transactional(readOnly = true)
     public List<HotelShortResponse> searchHotels(String name, String brand, String city, String country, List<String> amenities) {
-        log.debug("Searching hotels with criteria - name: {}, brand: {}, city: {}, country: {}, amenities: {}",
-                name, brand, city, country, amenities);
+        log.debug("Searching hotels with criteria - name: {}, brand: {}, city: {}, country: {}, amenities count: {}",
+                name, brand, city, country, amenities != null ? amenities.size() : 0);
 
         HotelSpecification spec = new HotelSpecification(name, brand, city, country, amenities);
-        return hotelRepository.findAll(spec).stream()
+        List<HotelShortResponse> results = hotelRepository.findAll(spec).stream()
                 .map(hotelMapper::toShortResponse)
                 .collect(Collectors.toList());
+        
+        log.info("Search completed: found {} hotels matching criteria", results.size());
+        return results;
     }
 
     /**
@@ -80,12 +89,16 @@ public class HotelServiceImpl implements HotelService {
      */
     @Override
     public HotelShortResponse createHotel(CreateHotelRequest request) {
-        log.debug("Creating new hotel: {}", request.getName());
+        log.info("Creating new hotel: {}", request.getName());
+        log.debug("Hotel creation details - Brand: {}, City: {}, Country: {}", 
+                request.getBrand(), 
+                request.getAddress() != null ? request.getAddress().getCity() : "N/A",
+                request.getAddress() != null ? request.getAddress().getCountry() : "N/A");
 
         Hotel hotel = hotelMapper.toEntity(request);
         Hotel savedHotel = hotelRepository.save(hotel);
 
-        log.info("Hotel created successfully with id: {}", savedHotel.getId());
+        log.info("Hotel created successfully with ID: {}", savedHotel.getId());
         return hotelMapper.toShortResponse(savedHotel);
     }
 
@@ -94,19 +107,26 @@ public class HotelServiceImpl implements HotelService {
      */
     @Override
     public HotelFullResponse addAmenitiesToHotel(Long hotelId, List<String> amenityNames) {
-        log.debug("Adding amenities to hotel id: {}", hotelId);
+        log.info("Adding {} amenities to hotel ID: {}", amenityNames.size(), hotelId);
+        log.debug("Amenities to add: {}", amenityNames);
 
         Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new HotelNotFoundException(hotelId));
+                .orElseThrow(() -> {
+                    log.error("Hotel not found with ID: {}", hotelId);
+                    return new HotelNotFoundException(hotelId);
+                });
 
         // Find or create amenities
         Set<Amenity> amenities = new HashSet<>();
+        int newAmenitiesCount = 0;
         for (String amenityName : amenityNames) {
             Amenity amenity = amenityRepository.findByName(amenityName)
                     .orElseGet(() -> {
+                        log.debug("Creating new amenity: {}", amenityName);
                         Amenity newAmenity = Amenity.builder()
                                 .name(amenityName)
                                 .build();
+                        newAmenitiesCount++;
                         return amenityRepository.save(newAmenity);
                     });
             amenities.add(amenity);
@@ -115,7 +135,7 @@ public class HotelServiceImpl implements HotelService {
         hotel.setAmenities(amenities);
         Hotel updatedHotel = hotelRepository.save(hotel);
 
-        log.info("Amenities added to hotel id: {}", hotelId);
+        log.info("Successfully added amenities to hotel ID: {} ({} new amenities created)", hotelId, newAmenitiesCount);
         return hotelMapper.toFullResponse(updatedHotel);
     }
 
@@ -128,18 +148,36 @@ public class HotelServiceImpl implements HotelService {
         log.debug("Getting histogram for parameter: {}", param);
 
         List<Object[]> results = switch (param.toLowerCase(Locale.ROOT)) {
-            case "brand" -> hotelRepository.countByBrand();
-            case "city" -> hotelRepository.countByCity();
-            case "country" -> hotelRepository.countByCountry();
-            case "amenities" -> hotelRepository.countByAmenities();
-            default -> throw new IllegalArgumentException("Invalid histogram parameter: " + param +
-                    ". Must be one of: brand, city, country, amenities");
+            case "brand" -> {
+                log.debug("Fetching histogram by brand");
+                yield hotelRepository.countByBrand();
+            }
+            case "city" -> {
+                log.debug("Fetching histogram by city");
+                yield hotelRepository.countByCity();
+            }
+            case "country" -> {
+                log.debug("Fetching histogram by country");
+                yield hotelRepository.countByCountry();
+            }
+            case "amenities" -> {
+                log.debug("Fetching histogram by amenities");
+                yield hotelRepository.countByAmenities();
+            }
+            default -> {
+                log.error("Invalid histogram parameter: {}", param);
+                throw new IllegalArgumentException("Invalid histogram parameter: " + param +
+                        ". Must be one of: brand, city, country, amenities");
+            }
         };
 
-        return results.stream()
+        Map<String, Long> histogram = results.stream()
                 .collect(Collectors.toMap(
                         row -> (String) row[0],
                         row -> ((Number) row[1]).longValue()
                 ));
+        
+        log.info("Histogram for '{}' returned {} entries", param, histogram.size());
+        return histogram;
     }
 }

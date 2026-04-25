@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         log.warn("Hotel not found: {}", ex.getMessage());
+        log.debug("Request URI: {}", request.getRequestURI());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
@@ -61,7 +62,7 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        log.warn("Validation error: {}", errors);
+        log.warn("Validation failed for request to {}: {}", request.getRequestURI(), errors);
 
         String message = "Validation failed: " + errors.toString();
 
@@ -69,6 +70,25 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(message)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+
+        log.warn("Bad request: {}", ex.getMessage());
+        log.debug("Request URI: {}", request.getRequestURI());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
 
@@ -85,7 +105,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        log.error("Unexpected error occurred", ex);
+        log.error("Unexpected error occurred while processing request to {}", request.getRequestURI(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())

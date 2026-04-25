@@ -20,3 +20,10 @@ management:
       show-details: always
       probes:
         enabled: true
+
+logging:
+  level:
+    root: WARN
+    com.gpsolutions: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: INFO

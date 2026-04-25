@@ -47,8 +47,9 @@ public class HotelController {
                     content = @Content(mediaType = "application/json"))
     })
     public ResponseEntity<List<HotelShortResponse>> getAllHotels() {
-        log.info("GET /property-view/hotels");
+        log.info("REST request to get all hotels");
         List<HotelShortResponse> hotels = hotelService.getAllHotels();
+        log.debug("Returning {} hotels", hotels.size());
         return ResponseEntity.ok(hotels);
     }
 
@@ -71,8 +72,9 @@ public class HotelController {
             @PathVariable
             @Parameter(description = "Hotel id", required = true)
             Long id) {
-        log.info("GET /property-view/hotels/{}", id);
+        log.info("REST request to get hotel by ID: {}", id);
         HotelFullResponse hotel = hotelService.getHotelById(id);
+        log.debug("Returning hotel: {}", hotel.getName());
         return ResponseEntity.ok(hotel);
     }
 
@@ -110,7 +112,7 @@ public class HotelController {
             @RequestParam(required = false)
             @Parameter(description = "Comma-separated amenity names")
             String amenities) {
-        log.info("GET /property-view/search - name: {}, brand: {}, city: {}, country: {}, amenities: {}",
+        log.info("REST request to search hotels - name: {}, brand: {}, city: {}, country: {}, amenities: {}",
                 name, brand, city, country, amenities);
 
         List<String> amenitiesList = amenities != null && !amenities.isEmpty()
@@ -118,6 +120,7 @@ public class HotelController {
                 : null;
 
         List<HotelShortResponse> results = hotelService.searchHotels(name, brand, city, country, amenitiesList);
+        log.debug("Search returned {} hotels", results.size());
         return ResponseEntity.ok(results);
     }
 
@@ -138,8 +141,12 @@ public class HotelController {
     })
     public ResponseEntity<HotelShortResponse> createHotel(
             @Valid @RequestBody CreateHotelRequest request) {
-        log.info("POST /property-view/hotels - Creating hotel: {}", request.getName());
+        log.info("REST request to create hotel: {}", request.getName());
+        log.debug("Hotel details: brand={}, city={}", 
+                request.getBrand(), 
+                request.getAddress() != null ? request.getAddress().getCity() : "N/A");
         HotelShortResponse createdHotel = hotelService.createHotel(request);
+        log.info("Hotel created successfully with ID: {}", createdHotel.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHotel);
     }
 
@@ -166,8 +173,10 @@ public class HotelController {
             @Parameter(description = "Hotel id", required = true)
             Long id,
             @Valid @RequestBody List<String> amenities) {
-        log.info("POST /property-view/hotels/{}/amenities - Adding {} amenities", id, amenities.size());
+        log.info("REST request to add amenities to hotel ID: {}", id);
+        log.debug("Adding {} amenities: {}", amenities.size(), amenities);
         HotelFullResponse updatedHotel = hotelService.addAmenitiesToHotel(id, amenities);
+        log.info("Successfully added amenities to hotel ID: {}", id);
         return ResponseEntity.ok(updatedHotel);
     }
 
@@ -191,8 +200,9 @@ public class HotelController {
             @PathVariable
             @Parameter(description = "Grouping parameter: brand, city, country, or amenities", required = true)
             String param) {
-        log.info("GET /property-view/histogram/{}", param);
+        log.info("REST request to get histogram by parameter: {}", param);
         Map<String, Long> histogram = hotelService.getHistogram(param);
+        log.debug("Histogram returned with {} entries", histogram.size());
         return ResponseEntity.ok(histogram);
     }
 }
