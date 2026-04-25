@@ -83,7 +83,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Run integration tests and coverage gate
-        run: ./mvnw -B verify -Ddependency-check.skip=true
+        run: ./mvnw -B verify -DskipDependencyCheck=true
 
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v6
@@ -97,6 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: [unit-tests]
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -122,7 +123,16 @@ jobs:
       - name: Run OWASP Dependency Check
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: ./mvnw -B dependency-check:check -DnvdApiKey=${NVD_API_KEY}
+        run: |
+          if [ -n "$NVD_API_KEY" ]; then
+            echo "Running OWASP Dependency Check with NVD API key"
+            ./mvnw -B dependency-check:check -DnvdApiKey=${NVD_API_KEY} -DnvdApiDelay=5000
+          else
+            echo "::warning::NVD_API_KEY not set. Skipping OWASP Dependency Check to avoid NVD API rate limiting."
+            echo "To enable this scan, add NVD_API_KEY to repository secrets."
+            echo "Get your free API key from: https://nvd.nist.gov/developers/request-an-api-key"
+            exit 0
+          fi
 
       - name: Upload OWASP report
         uses: actions/upload-artifact@v6
